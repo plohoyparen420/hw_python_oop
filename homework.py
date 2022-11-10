@@ -26,6 +26,7 @@ class Training:
     """Базовый класс тренировки."""
     LEN_STEP = 0.65
     M_IN_KM = 1000
+    MIN_IN_H = 60
 
     def __init__(self,
                  action: int,
@@ -64,13 +65,13 @@ class Running(Training):
                  weight: float,
                  ) -> None:
         super().__init__(action, duration, weight)
-        self.coeff_calorie_1 = 18
-        self.coeff_calorie_2 = 20
+        self.CALORIES_MEAN_SPEED_MULTIPLIER = 18
+        self.CALORIES_MEAN_SPEED_SHIFT = 1.79
 
     def get_spent_calories(self):
-        return ((self.coeff_calorie_1 * self.get_mean_speed()
-                - self.coeff_calorie_2) * self.weight
-                / self.M_IN_KM * (self.duration * 60))
+        return ((self.CALORIES_MEAN_SPEED_MULTIPLIER * self.get_mean_speed()
+                - self.CALORIES_MEAN_SPEED_SHIFT) * self.weight
+                / self.M_IN_KM * (self.duration * self.MIN_IN_H))
 
 
 class SportsWalking(Training):
@@ -89,13 +90,14 @@ class SportsWalking(Training):
                 * self.weight
                 + (self.get_mean_speed()**2 // self.height)
                 * k_2 * self.weight)
-                * self.duration * 60)
+                * self.duration * self.MIN_IN_H)
 
 
 class Swimming(Training):
     """Тренировка: плавание."""
     LEN_STEP = 1.38
-
+    COEFF_CALORIE_SWM_1 = 1.1
+    COEFF_CALORIE_SWM_2 = 2
     def __init__(self, action: int,
                  duration: float, weight: float,
                  length_pool: int, count_pool: int) -> None:
@@ -110,14 +112,23 @@ class Swimming(Training):
                 / self.duration)
 
     def get_spent_calories(self) -> float:
-        return (self.get_mean_speed() + 1.1) * 2 * self.weight
+        return (
+        (self.get_mean_speed() + self.COEFF_CALORIE_SWM_1)
+        * self.COEFF_CALORIE_SWM_2
+        * self.weight
+        )
+        
+                
 
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    workout_dict = {"SWM": Swimming, "RUN": Running, "WLK": SportsWalking}
-    return workout_dict[workout_type](*data)
-
+    workout_class: dict[str, dict] = {
+        "SWM": Swimming,
+        "RUN": Running,
+        "WLK": SportsWalking,
+    }
+    return workout_class[workout_type](*data)
 
 def main(training: Training) -> None:
     """Главная функция."""
