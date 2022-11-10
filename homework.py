@@ -59,19 +59,28 @@ class Training:
 
 class Running(Training):
     """Тренировка: бег."""
+    CALORIES_MEAN_SPEED_MULTIPLIER = 18
+    CALORIES_MEAN_SPEED_SHIFT = 20
+
     def __init__(self,
                  action: int,
                  duration: float,
                  weight: float,
                  ) -> None:
         super().__init__(action, duration, weight)
-        self.CALORIES_MEAN_SPEED_MULTIPLIER = 18
-        self.CALORIES_MEAN_SPEED_SHIFT = 1.79
+        self.weight = weight
 
-    def get_spent_calories(self):
-        return ((self.CALORIES_MEAN_SPEED_MULTIPLIER * self.get_mean_speed()
-                - self.CALORIES_MEAN_SPEED_SHIFT) * self.weight
-                / self.M_IN_KM * (self.duration * self.MIN_IN_H))
+    def get_spent_calories(self) -> float:
+        return (
+            (
+                self.CALORIES_MEAN_SPEED_MULTIPLIER * self.get_mean_speed()
+                - self.CALORIES_MEAN_SPEED_SHIFT
+            )
+            * self.weight
+            / self.M_IN_KM
+            * self.duration
+            * self.MIN_IN_H
+        )
 
 
 class SportsWalking(Training):
@@ -84,20 +93,20 @@ class SportsWalking(Training):
         self.height = height
 
     def get_spent_calories(self):
-        k_1 = 0.035
-        k_2 = 0.029
-        return ((k_1
+        CALORIES_WEIGHT_MULTIPLIER_1 = 0.035
+        CALORIES_WEIGHT_MULTIPLIER_2 = 0.029
+        return ((CALORIES_WEIGHT_MULTIPLIER_1
                 * self.weight
                 + (self.get_mean_speed()**2 // self.height)
-                * k_2 * self.weight)
+                * CALORIES_WEIGHT_MULTIPLIER_2 * self.weight)
                 * self.duration * self.MIN_IN_H)
 
 
 class Swimming(Training):
     """Тренировка: плавание."""
     LEN_STEP = 1.38
-    COEFF_CALORIE_SWM_1 = 1.1
-    COEFF_CALORIE_SWM_2 = 2
+    CALORIES_MEAN_SPEED_SHIFT = 1.1
+    CALORIES_MEAN_SPEED_MULTIPLIER = 2
 
     def __init__(self, action: int,
                  duration: float, weight: float,
@@ -114,8 +123,8 @@ class Swimming(Training):
 
     def get_spent_calories(self) -> float:
         return (
-            (self.get_mean_speed() + self.COEFF_CALORIE_SWM_1)
-            * self.COEFF_CALORIE_SWM_2
+            (self.get_mean_speed() + self.CALORIES_MEAN_SPEED_SHIFT)
+            * self.CALORIES_MEAN_SPEED_MULTIPLIER
             * self.weight
         )
 
