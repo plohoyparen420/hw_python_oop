@@ -98,6 +98,7 @@ class Swimming(Training):
     LEN_STEP = 1.38
     COEFF_CALORIE_SWM_1 = 1.1
     COEFF_CALORIE_SWM_2 = 2
+
     def __init__(self, action: int,
                  duration: float, weight: float,
                  length_pool: int, count_pool: int) -> None:
@@ -113,12 +114,10 @@ class Swimming(Training):
 
     def get_spent_calories(self) -> float:
         return (
-        (self.get_mean_speed() + self.COEFF_CALORIE_SWM_1)
-        * self.COEFF_CALORIE_SWM_2
-        * self.weight
+            (self.get_mean_speed() + self.COEFF_CALORIE_SWM_1)
+            * self.COEFF_CALORIE_SWM_2
+            * self.weight
         )
-        
-                
 
 
 def read_package(workout_type: str, data: list) -> Training:
@@ -129,6 +128,7 @@ def read_package(workout_type: str, data: list) -> Training:
         "WLK": SportsWalking,
     }
     return workout_class[workout_type](*data)
+
 
 def main(training: Training) -> None:
     """Главная функция."""
