@@ -24,9 +24,9 @@ class InfoMessage:
 
 class Training:
     """Базовый класс тренировки."""
-    LEN_STEP = 0.65
-    M_IN_KM = 1000
-    MIN_IN_H = 60
+    LEN_STEP: float = 0.65
+    M_IN_KM: int = 1000
+    MIN_IN_H: int = 60
 
     def __init__(self,
                  action: int,
@@ -59,8 +59,8 @@ class Training:
 
 class Running(Training):
     """Тренировка: бег."""
-    CALORIES_MEAN_SPEED_MULTIPLIER = 18
-    CALORIES_MEAN_SPEED_SHIFT = 1.79
+    CALORIES_MEAN_SPEED_MULTIPLIER: int = 18
+    CALORIES_MEAN_SPEED_SHIFT: float = 1.79
 
     def __init__(self,
                  action: int,
@@ -74,7 +74,7 @@ class Running(Training):
         return (
             (
                 self.CALORIES_MEAN_SPEED_MULTIPLIER * self.get_mean_speed()
-                - self.CALORIES_MEAN_SPEED_SHIFT
+                + self.CALORIES_MEAN_SPEED_SHIFT
             )
             * self.weight
             / self.M_IN_KM
@@ -85,6 +85,11 @@ class Running(Training):
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
+    CALORIES_WEIGHT_MULTIPLIER: float = 0.035
+    CALORIES_SPEED_HEIGHT_MULTIPLIER: float = 0.029
+    KMH_IN_MSEC: float = 0.278
+    CM_IN_M: int = 100
+
     def __init__(self,
                  action: int, duration: float,
                  weight: float,
@@ -93,20 +98,22 @@ class SportsWalking(Training):
         self.height = height
 
     def get_spent_calories(self):
-        CALORIES_WEIGHT_MULTIPLIER_1 = 0.035
-        CALORIES_WEIGHT_MULTIPLIER_2 = 0.029
-        return ((CALORIES_WEIGHT_MULTIPLIER_1
-                * self.weight
-                + (self.get_mean_speed()**2 // self.height)
-                * CALORIES_WEIGHT_MULTIPLIER_2 * self.weight)
-                * self.duration * self.MIN_IN_H)
+        return (
+            self.CALORIES_WEIGHT_MULTIPLIER * self.weight
+            + (
+                (self.get_mean_speed() * self.KMH_IN_MSEC) ** 2
+                / (self.height / self.CM_IN_M)
+            )
+            * self.CALORIES_SPEED_HEIGHT_MULTIPLIER
+            * self.weight
+        ) * self.duration * self.MIN_IN_H
 
 
 class Swimming(Training):
     """Тренировка: плавание."""
-    LEN_STEP = 1.38
-    CALORIES_MEAN_SPEED_SHIFT = 1.1
-    CALORIES_MEAN_SPEED_MULTIPLIER = 2
+    LEN_STEP: float = 1.38
+    CALORIES_MEAN_SPEED_SHIFT: float = 1.1
+    CALORIES_WEIGHT_MULTIPLIER: int = 2
 
     def __init__(self, action: int,
                  duration: float, weight: float,
@@ -124,8 +131,8 @@ class Swimming(Training):
     def get_spent_calories(self) -> float:
         return (
             (self.get_mean_speed() + self.CALORIES_MEAN_SPEED_SHIFT)
-            * self.CALORIES_MEAN_SPEED_MULTIPLIER
-            * self.weight
+            * self.CALORIES_WEIGHT_MULTIPLIER
+            * self.weight * self.duration
         )
 
 
